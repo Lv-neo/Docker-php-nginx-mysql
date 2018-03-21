@@ -1,0 +1,42 @@
+version: '2'
+services:
+  #mysql:
+  #  build: ./mysql
+  #  environment:
+  #    MYSQL_ROOT_PASSWORD: 
+  #  ports:
+  #    - "3306:3306"
+  php-fpm:
+        build: ./php7
+    ports:
+      - "9000:9000"
+    volumes:
+      - /www:/www #workdir
+      - /var/log/php:/var/log/php 
+    labels:
+      - php
+    restart: always
+    networks:
+      - internal
+    cap_add:
+      - ALL
+  nginx:
+    build: ./nginx/
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /www:/www #workdir
+      - /var/log/nginx:/var/log/nginx
+    labels:
+      - nginx
+    links:
+      - php-fpm
+    restart: always
+    networks:
+      internal:
+        aliases:
+          - test.neo.com
+          
+networks:
+    internal:
